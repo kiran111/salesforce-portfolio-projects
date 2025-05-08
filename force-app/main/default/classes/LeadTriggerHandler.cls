@@ -26,4 +26,28 @@ public with sharing class LeadTriggerHandler {
             }
         }
     }
+    
+    public static void preventDuplicateLeads(List<Lead> newLeads) {
+        Set<String> incomingEmails = new Set<String>();
+        for (Lead l : newLeads) {
+            if (l.Email != null) {
+                incomingEmails.add(l.Email.toLowerCase());
+            }
+        }
+
+        Map<String, Lead> existingMap = new Map<String, Lead>();
+        if (!incomingEmails.isEmpty()) {
+            for (Lead existing : [
+                SELECT Id, Email FROM Lead WHERE Email IN :incomingEmails
+            ]) {
+                existingMap.put(existing.Email.toLowerCase(), existing);
+            }
+        }
+
+        for (Lead l : newLeads) {
+            if (l.Email != null && existingMap.containsKey(l.Email.toLowerCase())) {
+                l.Email.addError('A lead with this email already exists.');
+            }
+        }
+    }
 }
