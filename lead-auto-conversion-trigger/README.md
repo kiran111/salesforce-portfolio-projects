@@ -16,5 +16,3 @@ Automatically converts Leads when the `Auto_Convert__c` checkbox is checked.
 ✔ Trigger handler covered by `LeadTriggerTest.cls`  
 ✔ Can be deployed with `sf project deploy start`
 
-## Screenshot (Optional):
-Add a screenshot of the Apex class in Salesforce
