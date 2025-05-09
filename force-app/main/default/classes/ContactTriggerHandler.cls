@@ -28,4 +28,22 @@ public with sharing class ContactTriggerHandler {
             Changed_On__c = System.now()
         );
     }
+
+    public static void createWelcomeTasks(List<Contact> newContactList) {
+       List<Task> tasks = new List<Task>();
+       for (Contact c : newContactList){
+           Task t = new Task();
+           t.Subject = 'Welcome Call';
+           t.ActivityDate = System.today().addDays(7);
+           t.whatId = c.Id;
+           t.Priority = 'Normal';
+           t.status = 'Not Started';
+           tasks.add(t);
+        }
+        if(!tasks.isEmpty()){
+            insert tasks;
+        }
+    }
+
+
 }

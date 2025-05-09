@@ -17,4 +17,15 @@ private class ContactTriggerTest {
 
         System.assertEquals(2, logs.size());
     }
+
+    @isTest
+    static void testWelcomeTaskCreation() {
+        Contact c = new Contact(FirstName = 'Test', LastName = 'User');
+        insert c;
+
+        List<Task>tasks = [Select Id, Subject, ActivityDate, WhatId, Priority, Status From Task Where WhatId = :c.Id];
+        System.assertEquals(1, tasks.size());
+        System.assertEquals('Welcome Call', tasks[0].Subject);
+        System.assertEquals(System.today().addDays(7), tasks[0].ActivityDate);
+    }
 }
