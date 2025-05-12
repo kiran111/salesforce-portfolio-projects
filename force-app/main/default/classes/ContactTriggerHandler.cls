@@ -1,4 +1,4 @@
-public with sharing class ContactTriggerHandler {
+public without sharing class ContactTriggerHandler {
     public static void logFieldChanges(List<Contact> newList, Map<Id, Contact> oldMap) {
         List<Field_Change_Log__c> logs = new List<Field_Change_Log__c>();
 
@@ -35,13 +35,30 @@ public with sharing class ContactTriggerHandler {
            Task t = new Task();
            t.Subject = 'Welcome Call';
            t.ActivityDate = System.today().addDays(7);
-           t.whatId = c.Id;
+           t.whoId = c.Id;
            t.Priority = 'Normal';
            t.status = 'Not Started';
            tasks.add(t);
         }
         if(!tasks.isEmpty()){
             insert tasks;
+        }
+    }
+
+    public static void cleanupFieldChangeLogs(List<Contact> deletedContacts){
+        set <Id> contactIds = new set<Id>();
+        for (Contact c : deletedContacts){
+            contactIds.add(c.Id);
+        }
+
+        System.debug('Contact IDs: ' + contactIds);
+
+        List<Field_Change_Log__c> logsToDelete = [SELECT Id FROM Field_Change_Log__c WHERE Contact__c IN :contactIds];
+        
+        System.debug('Logs to delete: ' + logsToDelete);
+
+        if(!logsToDelete.isEmpty()){
+            delete logsToDelete;
         }
     }
 

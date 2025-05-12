@@ -23,9 +23,41 @@ private class ContactTriggerTest {
         Contact c = new Contact(FirstName = 'Test', LastName = 'User');
         insert c;
 
-        List<Task>tasks = [Select Id, Subject, ActivityDate, WhatId, Priority, Status From Task Where WhatId = :c.Id];
+        List<Task>tasks = [Select Id, Subject, ActivityDate, WhatId, Priority, Status From Task Where WhoId = :c.Id];
         System.assertEquals(1, tasks.size());
         System.assertEquals('Welcome Call', tasks[0].Subject);
         System.assertEquals(System.today().addDays(7), tasks[0].ActivityDate);
     }
+
+    @isTest
+    static void testFieldChangeLogCleanup() {
+        
+        Contact c = new Contact(FirstName = 'Test', LastName = 'User');
+        insert c;
+
+        Field_Change_Log__c log1 = new Field_Change_Log__c(
+            Contact__c = c.Id,
+            Field_Name__c = 'Email'
+        );
+
+        Field_Change_Log__c log2 = new Field_Change_Log__c(
+            Contact__c = c.Id,
+            Field_Name__c = 'Phone'
+        );
+
+        insert new List<Field_Change_Log__c>{log1, log2};
+
+        Test.startTest();
+         delete c;
+        Test.stopTest();
+
+        List<Field_Change_Log__c> logs = [
+            SELECT Id 
+            FROM Field_Change_Log__c 
+            WHERE Contact__c = :c.Id
+        ];
+        
+        System.assertEquals(0, logs.size(), 'Logs should be deleted when the contact is deleted');
+
+        }
 }
