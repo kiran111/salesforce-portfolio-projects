@@ -1,4 +1,6 @@
-public without sharing class ContactTriggerHandler {
+public without sharing class ContactTriggerHandler implements ObjectTriggerHandler {
+   
+
     public static void logFieldChanges(List<Contact> newList, Map<Id, Contact> oldMap) {
         List<Field_Change_Log__c> logs = new List<Field_Change_Log__c>();
 
@@ -62,5 +64,28 @@ public without sharing class ContactTriggerHandler {
         }
     }
 
+    
+    public void beforeInsert(List<SObject> newList) {
+        // Not used for Contact — method included per interface contract
+    }
 
+    public void beforeUpdate(List<SObject> newList, Map<Id, SObject> oldMap) {
+        // Not used for Contact — method included per interface contract
+    }
+
+    public void beforeDelete(List<SObject> oldList) {
+        cleanupFieldChangeLogs((List<Contact>) oldList);
+    }
+
+    public void afterInsert(List<SObject> newList) {
+      createWelcomeTasks((List<Contact>) newList);
+    }
+
+    public void afterUpdate(List<SObject> newList, Map<Id, SObject> oldMap) {
+        logFieldChanges((List<Contact>)newList, (Map<Id,Contact> )oldMap);
+    }
+
+    public void afterDelete(List<SObject> oldList) {
+        // Not used for Contact — method included per interface contract
+    }
 }
